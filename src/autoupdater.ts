@@ -168,18 +168,22 @@ export class AutoUpdater {
     });
 
     let pullsPage: octokit.OctokitResponse<any>;
+    let conflictedList: {key: string, value: string}[] = [];
     for await (pullsPage of this.octokit.paginate.iterator(paginatorOpts)) {
       let pull: PullRequestResponse['data'];
       for (pull of pullsPage.data) {
         ghCore.startGroup(`PR-${pull.number}`);
         const isUpdated = await this.update(owner, pull);
         ghCore.endGroup();
-
         if (isUpdated) {
           updated++;
         }
+        // @ts-ignore
+        conflictedList.push({'pull_url': pull.html_url, 'pull_head': pull.head.ref, 'pull_owner': pull?.user?.login})
       }
     }
+
+    ghCore.setOutput(Output.ConflictedList, JSON.stringify(conflictedList));
 
     ghCore.info(
       `Auto update complete, ${updated} pull request(s) that point to base branch '${baseBranch}' were updated.`,
