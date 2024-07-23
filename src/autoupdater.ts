@@ -178,8 +178,11 @@ export class AutoUpdater {
         if (isUpdated) {
           updated++;
         }
-        // @ts-ignore
-        conflictedList.push({'pull_url': pull.html_url, 'pull_head': pull.head.ref, 'pull_owner': pull?.user?.login})
+        else {
+          // @ts-ignore
+          conflictedList.push({'pull_url': pull.html_url, 'pull_head': pull.head.ref, 'pull_owner': pull?.user?.login})
+        }
+
       }
     }
 
